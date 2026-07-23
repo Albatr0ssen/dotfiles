@@ -104,7 +104,7 @@ do
   vim.keymap.set('n', '<C-left>', '<C-w><')
   vim.keymap.set('n', '<C-right>', '<C-w>>')
 
-  -- System clipboard"
+  -- System clipboard
   vim.keymap.set({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'Yank to clipboard' })
   vim.keymap.set({ 'n', 'v' }, '<leader>p', '"+p', { desc = 'Paste from clipboard' })
   vim.keymap.set({ 'n', 'v' }, '<leader>d', '"+d', { desc = 'Delete to clipboard' })
@@ -730,6 +730,9 @@ do
     tsgo = {},
     svelte = {},
 
+    bashls = {},
+    shellcheck = {},
+
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
       on_init = function(client)
@@ -970,8 +973,9 @@ do
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
   -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
+
+  require 'kickstart.plugins.neo-tree'
 
   -- Custom plugins (custom plugins)
   require 'custom.plugins'
