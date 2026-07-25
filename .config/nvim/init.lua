@@ -300,8 +300,30 @@ do
     callback = function() vim.hl.on_yank() end,
   })
 
+  local ft_group = vim.api.nvim_create_augroup('FileTypeSettings', { clear = true })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    group = ft_group,
+    pattern = {},
+    callback = function(args)
+      vim.opt_local.tabstop = 4
+      vim.opt_local.shiftwidth = 4
+    end,
+  })
+
+  -- You can also target multiple filetypes at once
+  vim.api.nvim_create_autocmd('FileType', {
+    group = ft_group,
+    pattern = { 'javascript', 'typescript', 'svelte' },
+    callback = function()
+      vim.opt_local.tabstop = 2
+      vim.opt_local.shiftwidth = 2
+    end,
+  })
+
   -- Move help window to the right
   vim.api.nvim_create_autocmd('FileType', {
+    group = ft_group,
     pattern = 'help',
     callback = function(args)
       vim.cmd 'wincmd L'
@@ -568,7 +590,13 @@ do
         },
       },
     },
-    -- pickers = {}
+    pickers = {
+      lsp_references = {
+        file_ignore_patterns = {
+          '/%.',
+        },
+      },
+    },
     extensions = {
       ['ui-select'] = { require('telescope.themes').get_dropdown() },
     },
@@ -712,6 +740,37 @@ do
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
         vim.lsp.inlay_hint.enable()
         map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+
+        local orig_inlay_hint_handler = vim.lsp.inlay_hint.on_inlayhint
+
+        ---@diagnostic disable-next-line: duplicate-set-field
+        vim.lsp.inlay_hint.on_inlayhint = function(err, result, ctx)
+          local max_len = 15
+
+          if result then
+            for _, hint in ipairs(result) do
+              local label = hint.label
+              if type(label) == 'string' and #label > max_len then
+                hint.label = string.sub(label, 1, max_len - 3) .. '...'
+              elseif type(label) == 'table' then
+                local current_len = 0
+                local reached_max = false
+                for _, part in ipairs(label) do
+                  if current_len + #part.value > max_len then
+                    if not reached_max then
+                      part.value = string.sub(part.value, 1, math.max(0, max_len - current_len - 3)) .. '...'
+                    else
+                      part.value = ''
+                    end
+                    reached_max = true
+                  end
+                  current_len = current_len + #part.value
+                end
+              end
+            end
+          end
+          orig_inlay_hint_handler(err, result, ctx)
+        end
       end
     end,
   })
@@ -727,8 +786,58 @@ do
 
     prettierd = {},
     tailwindcss = {},
-    tsgo = {},
-    svelte = {},
+    -- tsgo = {},
+    vtsls = {
+      settings = {
+        vtsls = {
+          autoUseWorkspaceTsdk = true,
+        },
+        typescript = {
+          tsserver = {
+            pluginPaths = {
+              './node_modules',
+            },
+          },
+          inlayHints = {
+            parameterNames = {
+              enabled = 'all',
+            },
+            parameterTypes = {
+              enabled = true,
+            },
+            variableTypes = {
+              enabled = true,
+            },
+            propertyDeclarationTypes = {
+              enabled = true,
+            },
+            functionLikeReturnTypes = {
+              enabled = true,
+            },
+            enumMemberValues = {
+              enabled = true,
+            },
+          },
+        },
+      },
+    },
+    svelte = {
+      settings = {
+        typescript = {
+          inlayHints = {
+            parameterNames = {
+              enabled = 'literals',
+              suppressWhenArgumentMatchesName = true,
+            },
+            parameterTypes = { enabled = true },
+            variableTypes = { enabled = true },
+            propertyDeclarationTypes = { enabled = true },
+            functionLikeReturnTypes = { enabled = false },
+            enumMemberValues = { enabled = true },
+          },
+        },
+      },
+    },
 
     bashls = {},
     shellcheck = {},
