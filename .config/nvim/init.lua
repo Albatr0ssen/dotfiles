@@ -1089,6 +1089,9 @@ do
   -- Custom plugins (custom plugins)
   require 'custom.plugins'
   require('custom.plugins.ui').setup()
+
+  vim.pack.add { gh 'nvim-svelte/nvim-svelte-check' }
+  require('svelte-check').setup()
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
