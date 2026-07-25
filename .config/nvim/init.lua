@@ -68,6 +68,9 @@ do
   -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
   -- instead raise a dialog asking if you wish to save the current file(s)
   vim.o.confirm = true
+
+  vim.o.tabstop = 2
+  vim.o.shiftwidth = 2
 end
 
 -- ============================================================
@@ -304,14 +307,13 @@ do
 
   vim.api.nvim_create_autocmd('FileType', {
     group = ft_group,
-    pattern = {},
+    pattern = { 'cpp' },
     callback = function(args)
       vim.opt_local.tabstop = 4
       vim.opt_local.shiftwidth = 4
     end,
   })
 
-  -- You can also target multiple filetypes at once
   vim.api.nvim_create_autocmd('FileType', {
     group = ft_group,
     pattern = { 'javascript', 'typescript', 'svelte' },
@@ -1089,9 +1091,6 @@ do
   -- Custom plugins (custom plugins)
   require 'custom.plugins'
   require('custom.plugins.ui').setup()
-
-  vim.pack.add { gh 'nvim-svelte/nvim-svelte-check' }
-  require('svelte-check').setup()
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
