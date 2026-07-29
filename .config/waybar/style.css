@@ -1,0 +1,334 @@
+@define-color bg-pink #FFB5F0;
+@define-color bg-purp #770070;
+@define-color bg-dark #121212;
+@define-color bg-black #000000;
+@define-color bg-primary @bg-black;
+@define-color color-primary white;
+@define-color error-red #E01D1D;
+@define-color warning-yellow #FFE952;
+@define-color cool-green #26A65B;
+
+* {
+  border: none;
+  border-radius: 0;
+  font-family: FontAwesome;
+  font-size: 13px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+window#waybar {
+  /* background: rgba(255, 255, 255, 0.1); */
+  /* background: rgba(43, 48, 59, 0.7); */
+  background: rgba(0, 0, 0, 0);
+  color: white;
+}
+
+tooltip {
+  background: rgba(12, 12, 12, 0.8);
+  border-radius: 5px;
+}
+
+tooltip label {
+  color: white;
+}
+
+#custom-padding {
+  min-width: 12px;
+}
+
+#workspaces {
+  background-color: @bg-primary;
+  min-height: 25px;
+  border-radius: 5px;
+  margin: 2px 0;
+  padding: 2px;
+  /* border-width: 0.6px; */
+  /* border-style: solid; */
+  /* border-color: @bg-pink; */
+}
+
+#workspaces button {
+  color: white;
+  padding: 0;
+  margin: 0 1.5px;
+  min-width: 25px;
+  min-height: 25px;
+  border-radius: 5px;
+}
+
+#workspaces button.urgent {
+  background-color: #FFA254;
+  color: black;
+}
+
+#workspaces button.visible {
+  background-color: #EA96FF;
+  color: black;
+}
+
+#workspaces button.active {
+  background-color: @bg-purp;
+  color: white;
+}
+
+#workspaces button:hover {
+  background: inherit;
+  border: inherit;
+  box-shadow: inherit;
+  text-shadow: inherit;
+  background-color: white;
+  color: black;
+}
+
+#submap {
+  background-color: @color-primary;
+  color: @bg-primary;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+  border-radius: 5px;
+}
+
+#clock {
+  background-color: @bg-primary;
+  color: @color-primary;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+  border-radius: 5px;
+}
+
+#battery {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+}
+
+#battery.warning {
+  background-color: @warning-yellow;
+  color: black;
+}
+
+#battery.critical {
+  background-color: @error-red;
+  color: white;
+}
+
+@keyframes blink {
+  to {
+    background-color: white;
+    color: black;
+  }
+}
+
+#battery.critical:not(.charging) {
+  animation-name: blink;
+  animation-duration: 0.3s;
+  animation-timing-function: steps(12);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#battery.charging {
+  background-color: @cool-green;
+  color: white;
+  min-height: 25px;
+}
+
+#battery.plugged {
+  background-color: @cool-green;
+  color: white;
+  min-width: 50px;
+  min-height: 25px;
+}
+
+#power-profiles-daemon {
+  background-color: @bg-primary;
+  color: black;
+  border-radius: 5px;
+  margin: 5px 0;
+  min-width: 30px;
+  min-height: 25px;
+}
+
+#power-profiles-daemon.power-saver {
+  color: @cool-green;
+}
+
+#power-profiles-daemon.balanced {
+  color: @warning-yellow;
+}
+
+#power-profiles-daemon.performance {
+  color: @error-red;
+}
+
+#network {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+}
+
+#network.disconnected {
+  background-color: @error-red;
+  color: white;
+}
+
+#custom-vpn {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+}
+
+#custom-vpn.disconnected {
+  color: @error-red;
+}
+
+#custom-vpn.connected {
+  color: @cool-green;
+}
+
+#custom-backup {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+}
+
+#custom-backup.fresh {
+  color: @cool-green;
+}
+
+#custom-backup.dusty {
+  color: @warning-yellow;
+}
+
+#custom-backup.ancient {
+  color: @error-red;
+}
+
+#custom-backup.null {
+  color: @bg-purp;
+}
+
+#custom-spotifyd {
+  background-color: @bg-primary;
+  color: @cool-green;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 0 10px;
+  min-height: 25px;
+}
+
+#custom-spotifyd.multiple {
+  color: @warning-yellow;
+}
+
+#backlight {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  min-width: 65px;
+  min-height: 25px;
+}
+
+
+#pulseaudio {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 0 10px;
+  /* min-width: 70px; */
+  min-height: 25px;
+}
+
+#pulseaudio.bluetooth {
+  /* min-width: 85px; */
+}
+
+#pulseaudio.muted {
+  color: white;
+  padding: 0 0px;
+  min-width: 35px;
+  padding-left: 2px;
+}
+
+#bluetooth {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  min-width: 30px;
+  min-height: 25px;
+}
+
+#bluetooth.off {
+  color: @error-red;
+}
+
+#bluetooth.on {
+  color: @cool-green;
+}
+
+#bluetooth.connected {
+  color: #0AA2FF;
+  padding: 0 6px;
+}
+
+
+#cpu {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  min-width: 62px;
+  min-height: 25px;
+}
+
+#memory {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  min-width: 70px;
+  min-height: 25px;
+}
+
+#memory.warning {
+  color: @warning-yellow;
+}
+
+#memory.critical {
+  color: @error-red;
+}
+
+#idle_inhibitor {
+  background-color: @bg-primary;
+  color: @color-primary;
+  border-radius: 5px;
+  margin: 5px 0;
+  min-width: 40px;
+  min-height: 25px;
+}
+
+#idle_inhibitor.activated {
+  /* background-color: @color-primary; */
+  /* color: @bg-primary; */
+  background-color: @bg-primary;
+  color: @color-primary;
+}
