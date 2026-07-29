@@ -524,14 +524,31 @@ do
   require('mini.bufremove').setup()
   vim.keymap.set('n', '<leader>bd', MiniBufremove.delete, { desc = 'Delete current buffer' })
   vim.keymap.set('n', '<leader>bw', MiniBufremove.wipeout, { desc = 'Wipeout current buffer' })
-  vim.keymap.set('n', '<leader>bo', function()
-    local current = vim.api.nvim_get_current_buf()
+
+  --- @param should_delete fun(integer): boolean
+  local function delete_buffers(should_delete)
     local buffers = vim.api.nvim_list_bufs()
     for _, buf in ipairs(buffers) do
-      local deleting = buf ~= current and vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted and vim.bo[buf].buftype == ''
+      local deleting = vim.bo[buf].buflisted and vim.bo[buf].buftype == ''
+      deleting = deleting and should_delete(buf)
       if deleting then MiniBufremove.delete(buf) end
     end
+  end
+
+  vim.keymap.set('n', '<leader>bo', function()
+    local current = vim.api.nvim_get_current_buf()
+    delete_buffers(function(buf) return current ~= buf end)
   end, { desc = 'Delete other buffers' })
+
+  vim.keymap.set('n', '<leader>bl', function()
+    local current = vim.api.nvim_get_current_buf()
+    delete_buffers(function(buf) return buf < current end)
+  end, { desc = 'Delete left buffers' })
+
+  vim.keymap.set('n', '<leader>br', function()
+    local current = vim.api.nvim_get_current_buf()
+    delete_buffers(function(buf) return current < buf end)
+  end, { desc = 'Delete right buffers' })
 
   -- Sessions
   require('mini.sessions').setup { file = '' }
