@@ -260,6 +260,7 @@ do
   end
 
   vim.keymap.set('n', '<C-_>', open_terminal(vim.o.shell, 0.9))
+  vim.keymap.set('n', '<leader>ct', open_terminal(vim.o.shell, 0.9))
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
   vim.keymap.set('t', '<Esc>q', '<C-\\><C-n><C-w>q', { desc = 'Close terminal' })
 
