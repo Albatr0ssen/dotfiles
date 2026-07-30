@@ -260,7 +260,7 @@ do
   end
 
   vim.keymap.set('n', '<C-_>', open_terminal(vim.o.shell, 0.9))
-  vim.keymap.set('n', '<leader>ct', open_terminal(vim.o.shell, 0.9))
+  vim.keymap.set('n', '<leader>ct', open_terminal(vim.o.shell, 0.9), { desc = 'Open terminal' })
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
   vim.keymap.set('t', '<Esc>q', '<C-\\><C-n><C-w>q', { desc = 'Close terminal' })
 
@@ -436,6 +436,7 @@ do
     spec = {
       { '<leader>C', group = '[C]onfig', mode = { 'n' } },
       { '<leader>c', group = '[C]ode', mode = { 'n' } },
+      { '<leader>cc', group = 'Language keymaps', mode = { 'n' } },
       { '<leader>g', group = '[G]it', mode = { 'n' } },
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
@@ -1110,6 +1111,5 @@ do
   require 'custom.plugins'
   require('custom.plugins.ui').setup()
 end
-
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

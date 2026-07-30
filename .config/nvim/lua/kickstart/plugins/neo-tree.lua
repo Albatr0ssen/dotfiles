@@ -41,7 +41,7 @@ require('neo-tree').setup {
       mappings = {
         ['\\'] = 'close_window',
         ['l'] = 'open',
-        -- ['h'] = 'navigate_up',
+        ['H'] = '',
         ['P'] = {
           'toggle_preview',
           config = {
