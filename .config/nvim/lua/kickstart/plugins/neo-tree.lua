@@ -32,6 +32,7 @@ end, { desc = 'NeoTree reveal', silent = true })
 require('neo-tree').setup {
   filesystem = {
     filtered_items = {
+      visible = true,
       hide_dotfiles = false,
     },
     window = {
@@ -41,7 +42,7 @@ require('neo-tree').setup {
       mappings = {
         ['\\'] = 'close_window',
         ['l'] = 'open',
-        ['H'] = '',
+        -- ['H'] = '',
         ['P'] = {
           'toggle_preview',
           config = {
