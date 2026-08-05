@@ -7,27 +7,13 @@ vim.pack.add {
   'https://github.com/MunifTanjim/nui.nvim',
 }
 
-vim.api.nvim_create_autocmd('BufEnter', {
-  callback = function()
-    local manager = require 'neo-tree.sources.manager'
-    local renderer = require 'neo-tree.ui.renderer'
-    local command = require 'neo-tree.command'
-
-    local state = manager.get_state 'filesystem'
-
-    if renderer.tree_is_visible(state) then command.execute {
-      action = 'show',
-      source = 'filesystem',
-      reveal = true,
-    } end
-  end,
-})
+local command = require 'neo-tree.command'
 
 vim.keymap.set(
   'n',
   '<leader>e',
   function()
-    require('neo-tree.command').execute {
+    command.execute {
       toggle = true,
       action = 'focus',
       source = 'filesystem',
@@ -40,6 +26,7 @@ vim.keymap.set(
 
 require('neo-tree').setup {
   filesystem = {
+    follow_current_file = { enabled = true, leave_dirs_open = false },
     filtered_items = {
       visible = true,
       hide_dotfiles = false,
