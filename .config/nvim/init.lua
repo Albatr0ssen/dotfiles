@@ -310,7 +310,7 @@ do
   vim.api.nvim_create_autocmd('FileType', {
     group = ft_group,
     pattern = { 'cpp' },
-    callback = function(args)
+    callback = function()
       vim.opt_local.tabstop = 4
       vim.opt_local.shiftwidth = 4
     end,
@@ -329,7 +329,7 @@ do
   vim.api.nvim_create_autocmd('FileType', {
     group = ft_group,
     pattern = 'help',
-    callback = function(args)
+    callback = function()
       vim.cmd 'wincmd L'
       vim.cmd 'vertical resize 80'
     end,
@@ -568,8 +568,6 @@ do
     callback = function()
       if vim.fn.argc() ~= 0 then return end
 
-      local buf = vim.api.nvim_get_current_buf()
-
       vim.keymap.set('n', 's', function()
         local session = MiniSessions.detected[get_session_name()]
         if session ~= nil then
@@ -578,14 +576,22 @@ do
           vim.notify 'No session found'
         end
       end, {
-        buffer = buf,
+        buffer = 0,
         silent = true,
       })
     end,
   })
 
   vim.api.nvim_create_autocmd('VimLeavePre', {
-    callback = function() MiniSessions.write(get_session_name(), {}) end,
+    callback = function()
+      if vim.fn.argc() ~= 0 then return end
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if require('custom.plugins.bufhelper').is_good_buf(buf) then
+          MiniSessions.write(get_session_name(), {})
+          break
+        end
+      end
+    end,
   })
 end
 

@@ -1,11 +1,13 @@
+local is_good_buf = require('custom.plugins.bufhelper').is_good_buf
+
 --- @type integer[]
 local buf_history = {}
 
 vim.api.nvim_create_autocmd('BufDelete', {
   callback = function(args)
     local buf = args.buf
-    local real = vim.bo[buf].buflisted and vim.bo[buf].buftype == ''
-    if not real then return end
+    if not vim.api.nvim_buf_is_valid(buf) then return end
+    if not is_good_buf(buf) then return end
     table.insert(buf_history, buf)
   end,
 })
