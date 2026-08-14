@@ -6,6 +6,9 @@ do
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
+  -- Fix issue with tmux idk
+  vim.o.termsync = false
+
   -- Set <space> as the leader key
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
@@ -183,91 +186,18 @@ do
   )
 
   -- Terminal
-  -- TODO: Should prob move some stuff to plugin
-  -- Look into maybe making float_term work (persistant terminal window possible?, at least make toggle:able)
-  local function create_backdrop()
-    local buf = vim.api.nvim_create_buf(false, true)
+  local float_term = require 'custom.plugins.float_term'
 
-    vim.api.nvim_set_hl(0, 'TerminalBackdrop', {
-      bg = '#000000',
-    })
+  local open_shell = float_term.create(vim.o.shell, 0.9, { 't', '<C-_>' })
 
-    local win = vim.api.nvim_open_win(buf, false, {
-      relative = 'editor',
-      width = vim.o.columns,
-      height = vim.o.lines,
-      row = 0,
-      col = 0,
-      style = 'minimal',
-      focusable = false,
-      zindex = 40,
-    })
-
-    vim.api.nvim_set_option_value('winhl', 'Normal:TerminalBackdrop', { win = win })
-
-    vim.api.nvim_set_option_value('winblend', 40, {
-      win = win,
-    })
-
-    return win
-  end
-
-  ---@param cmd string
-  ---@param size number
-  ---@return function
-  local function open_terminal(cmd, size)
-    return function()
-      local backdrop_win = create_backdrop()
-
-      local buf = vim.api.nvim_create_buf(false, false)
-      vim.bo[buf].buftype = 'nofile'
-      vim.bo[buf].bufhidden = 'wipe'
-      vim.bo[buf].swapfile = false
-
-      local editor_width = vim.o.columns
-      local editor_height = vim.o.lines
-      local width = math.floor(editor_width * size)
-      local height = math.floor(editor_height * size)
-      local col = math.floor((editor_width - width) / 2)
-      local row = math.floor((editor_height - height) / 2)
-
-      local win = vim.api.nvim_open_win(buf, true, {
-        relative = 'editor',
-        width = width,
-        height = height,
-        row = row,
-        col = col,
-        border = 'rounded',
-        style = 'minimal',
-        zindex = 50,
-      })
-
-      vim.api.nvim_win_call(win, function()
-        vim.fn.jobstart(cmd, {
-          term = true,
-          pty = true,
-          on_exit = function()
-            if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, false) end
-            if vim.api.nvim_win_is_valid(backdrop_win) then vim.api.nvim_win_close(backdrop_win, false) end
-          end,
-        })
-        vim.cmd.startinsert()
-      end)
-
-      vim.keymap.set('n', 'q', '<C-w>q', { buffer = buf, desc = 'Close terminal window' })
-
-      return win
-    end
-  end
-
-  vim.keymap.set('n', '<C-_>', open_terminal(vim.o.shell, 0.9))
-  vim.keymap.set('n', '<leader>ct', open_terminal(vim.o.shell, 0.9), { desc = 'Open terminal' })
+  vim.keymap.set('n', '<C-_>', open_shell, { desc = 'Open terminal' })
+  vim.keymap.set('n', '<leader>ct', open_shell, { desc = 'Open terminal' })
   vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
   vim.keymap.set('t', '<Esc>q', '<C-\\><C-n><C-w>q', { desc = 'Close terminal' })
 
   -- Git
-  local open_lazygit = open_terminal('lazygit', 0.9)
-  local open_lazygit_dotfiles = open_terminal('lazygit -g $HOME/.dotfiles -w $HOME', 0.9)
+  local open_lazygit = float_term.create('lazygit', 0.9)
+  local open_lazygit_dotfiles = float_term.create('lazygit -g $HOME/.dotfiles -w $HOME', 0.9)
 
   vim.keymap.set('n', '<leader>gg', function()
     local cwd = vim.fn.getcwd()

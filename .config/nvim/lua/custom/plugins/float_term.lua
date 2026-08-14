@@ -1,65 +1,88 @@
 local M = {}
 
-COUNTER = 0
+local id_counter = 0
 
----@type integer[]
-TERMINAL_BUFS = {}
+---@type {[integer]: integer}
+local bufs = {}
 
----@param cmd string
-local function create_float_term(cmd)
-  local buf = vim.api.nvim_create_buf(false, false)
+vim.api.nvim_create_autocmd('ExitPre', {
+  callback = function()
+    print 'exit'
+    for _, buf in pairs(bufs) do
+      if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_delete(buf, { force = true }) end
+    end
+  end,
+})
 
-  vim.bo[buf].buftype = 'nofile'
-  vim.bo[buf].swapfile = false
-
-  vim.api.nvim_buf_call(buf, function()
-    vim.fn.jobstart(cmd, {
-      term = true,
-      pty = true,
-      -- on_exit = function()
-      --   if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, false) end
-      -- end,
-    })
-    vim.cmd 'startinsert'
-  end)
-
-  vim.keymap.set('n', 'q', '<C-w>q', { buffer = buf, desc = 'Close terminal window' })
-
-  return buf
+local function generate_id()
+  local id = id_counter
+  id_counter = id_counter + 1
+  return id
 end
 
-local function dump_terminal_bufs()
-  local msg = ''
-  for _, value in ipairs(TERMINAL_BUFS) do
-    msg = msg .. value .. ' '
+---@param id integer
+---@return integer, boolean
+local function get_buf(id)
+  local buf = bufs[id]
+  local needs_setup = false
+
+  if buf == nil or not vim.api.nvim_buf_is_valid(buf) then
+    buf = vim.api.nvim_create_buf(false, false)
+    vim.bo[buf].buftype = 'nofile'
+    vim.bo[buf].bufhidden = 'hide'
+    vim.bo[buf].swapfile = false
+    bufs[id] = buf
+    needs_setup = true
   end
-  vim.notify(msg, vim.log.levels.WARN)
+
+  return buf, needs_setup
 end
+
+local function create_backdrop()
+  local buf = vim.api.nvim_create_buf(false, true)
+
+  vim.api.nvim_set_hl(0, 'TerminalBackdrop', {
+    bg = '#000000',
+  })
+
+  local win = vim.api.nvim_open_win(buf, false, {
+    relative = 'editor',
+    width = vim.o.columns,
+    height = vim.o.lines,
+    row = 0,
+    col = 0,
+    style = 'minimal',
+    focusable = false,
+    zindex = 40,
+  })
+
+  vim.api.nvim_set_option_value('winhl', 'Normal:TerminalBackdrop', { win = win })
+
+  vim.api.nvim_set_option_value('winblend', 40, {
+    win = win,
+  })
+
+  return win
+end
+
+local function close_window(win)
+  if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, false) end
+end
+
 ---@param cmd string
 ---@param size number
----@param temp boolean
+---@param close_keymap string[] | nil
 ---@return function
-function M.open(cmd, size, temp)
-  local buf
-  local id
+M.create = function(cmd, size, close_keymap)
+  local id = generate_id()
 
-  if not temp then
-    COUNTER = COUNTER + 1
-    id = COUNTER
-    TERMINAL_BUFS[id] = create_float_term(cmd)
-    vim.bo[TERMINAL_BUFS[id]].bufhidden = 'hide'
-  end
+  local close_keymaps = { { 'n', 'q' } }
+  if close_keymap ~= nil then table.insert(close_keymaps, close_keymap) end
 
   return function()
-    if temp then
-      buf = create_float_term(cmd)
-      vim.bo[buf].bufhidden = 'wipe'
-    else
-      buf = TERMINAL_BUFS[id]
-    end
+    local buf, needs_setup = get_buf(id)
 
-    vim.cmd('echo ' .. buf)
-    dump_terminal_bufs()
+    local backdrop_win = create_backdrop()
 
     local editor_width = vim.o.columns
     local editor_height = vim.o.lines
@@ -68,7 +91,7 @@ function M.open(cmd, size, temp)
     local col = math.floor((editor_width - width) / 2)
     local row = math.floor((editor_height - height) / 2)
 
-    local win = vim.api.nvim_open_win(buf, true, {
+    local terminal_win = vim.api.nvim_open_win(buf, true, {
       relative = 'editor',
       width = width,
       height = height,
@@ -76,7 +99,49 @@ function M.open(cmd, size, temp)
       col = col,
       border = 'rounded',
       style = 'minimal',
+      zindex = 50,
     })
+
+    if needs_setup then
+      vim.api.nvim_win_call(terminal_win, function()
+        vim.fn.jobstart(cmd, {
+          term = true,
+          pty = true,
+          on_exit = function()
+            close_window(terminal_win)
+            if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_delete(buf, { force = true }) end
+          end,
+        })
+      end)
+    end
+
+    vim.api.nvim_create_autocmd('WinLeave', {
+      buf = buf,
+      once = true,
+      callback = function()
+        vim.schedule(function() close_window(terminal_win) end)
+      end,
+    })
+
+    vim.api.nvim_create_autocmd('WinClosed', {
+      pattern = tostring(terminal_win),
+      once = true,
+      callback = function() close_window(backdrop_win) end,
+    })
+
+    for _, keymap in ipairs(close_keymaps) do
+      local mode = keymap[1]
+      local lhs = keymap[2]
+      if mode == nil or lhs == nil then
+        print('Failed to parse keymap: ' .. mode .. ' ' .. lhs)
+      else
+        vim.keymap.set(keymap[1], keymap[2], function() close_window(terminal_win) end, { buffer = buf, desc = 'Close terminal window' })
+      end
+    end
+
+    vim.cmd.startinsert()
+
+    return terminal_win
   end
 end
 
