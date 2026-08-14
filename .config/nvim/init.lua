@@ -101,6 +101,10 @@ do
   vim.keymap.set('n', 'H', '<cmd>bprevious<CR>')
   vim.keymap.set('n', 'L', '<cmd>bnext<CR>')
 
+  -- Indent
+  vim.keymap.set('v', '>', '>gv')
+  vim.keymap.set('v', '<', '<gv')
+
   -- Window splitting
   vim.keymap.set('n', '<leader>|', '<cmd>vsplit<CR>', { desc = 'Split window vertically' })
   vim.keymap.set('n', '<leader>-', '<cmd>split<CR>', { desc = 'Split window horizontally' })
