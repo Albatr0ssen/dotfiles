@@ -23,11 +23,6 @@ alias grep='grep --color=auto'
 alias lg='lazygit'
 alias ff='fastfetch'
 
-alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-source /usr/share/bash-completion/completions/git
-__git_complete dotfiles __git_main
-alias lg-dotfiles='lazygit --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-
 alias tmux-session='tmux new-session -A -s'
 alias pptx2pdf='soffice --headless --convert-to pdf'
 alias source-bashrc='source $HOME/.bashrc'
