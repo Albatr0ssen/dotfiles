@@ -3,6 +3,12 @@
 --
 -- source = ./programs/chatterino.conf
 
+---@param text unknown
+---@param icon "warn" | "ok" | nil
+local function notify(text, icon)
+	hl.notification.create({ text = tostring(text), icon = icon or "ok", timeout = 2000 })
+end
+
 hl.config({
 	-- debug = {
 	-- 	disable_logs = false,
@@ -14,6 +20,13 @@ hl.monitor({
 	mode = "preferred",
 	position = "auto",
 	scale = 1.67,
+})
+
+hl.monitor({
+	output = "DP-4",
+	mode = "preferred",
+	position = "auto-up",
+	scale = 1,
 })
 
 hl.on("config.reloaded", function()
@@ -163,6 +176,36 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(terminal .. " --class waybar-tui impa
 
 for _, direction in ipairs({ "left", "right", "up", "down" }) do
 	hl.bind(mainMod .. " + " .. direction, hl.dsp.focus({ direction = direction }))
+	hl.bind(mainMod .. " + CTRL + " .. direction, function()
+		local function safe_active_monitor()
+			local monitor = hl.get_active_monitor()
+			if monitor == nil then
+				error("monitor nil")
+			end
+			return monitor
+		end
+
+		local ok, result = pcall(function()
+			local current = safe_active_monitor()
+			hl.dispatch(hl.dsp.focus({ direction = direction }))
+			local other = safe_active_monitor()
+			hl.dispatch(hl.dsp.focus({ monitor = current }))
+
+			if current.id == other.name then
+				return
+			end
+
+			hl.dispatch(hl.dsp.workspace.swap_monitors({
+				monitor1 = current.id,
+				monitor2 = other.id,
+			}))
+			hl.dispatch(hl.dsp.focus({ monitor = other }))
+		end)
+
+		if not ok then
+			notify(result, "warn")
+		end
+	end)
 end
 
 for i = 1, 10 do
