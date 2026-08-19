@@ -6,9 +6,6 @@ do
   -- Enable faster startup by caching compiled Lua modules
   vim.loader.enable()
 
-  -- Fix issue with tmux idk
-  vim.o.termsync = false
-
   -- Set <space> as the leader key
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
@@ -57,7 +54,7 @@ do
 
   -- Sets how neovim will display certain whitespace characters in the editor.
   vim.o.list = true
-  vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+  vim.opt.listchars = { tab = '- ', trail = '·', nbsp = '␣' }
 
   -- Preview substitutions live, as you type!
   vim.o.inccommand = 'split'
