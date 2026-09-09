@@ -72,6 +72,20 @@ do
   vim.o.tabstop = 2
   vim.o.shiftwidth = 2
   vim.o.expandtab = true
+
+  vim.filetype.add {
+    filename = {
+      ['docker-compose.yml'] = 'yaml.docker-compose',
+      ['docker-compose.yaml'] = 'yaml.docker-compose',
+      ['compose.yml'] = 'yaml.docker-compose',
+      ['compose.yaml'] = 'yaml.docker-compose',
+    },
+    extension = {
+      tf = 'opentofu',
+      tfvars = 'opentofu-vars',
+      tofu = 'opentofu',
+    },
+  }
 end
 
 -- ============================================================
@@ -111,6 +125,9 @@ do
   vim.keymap.set('n', '<C-down>', '<C-w>-')
   vim.keymap.set('n', '<C-left>', '<C-w><')
   vim.keymap.set('n', '<C-right>', '<C-w>>')
+
+  -- Paste
+  vim.keymap.set('v', 'p', '"_dP', { desc = 'Paste without overwriting register' })
 
   -- System clipboard
   vim.keymap.set({ 'n', 'v' }, '<leader>y', '"+y', { desc = 'Yank to clipboard' })
@@ -263,6 +280,16 @@ do
     callback = function()
       vim.cmd 'wincmd L'
       vim.cmd 'vertical resize 80'
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    group = ft_group,
+    pattern = { 'opentofu', 'opentofu-vars' },
+    callback = function()
+      vim.opt_local.tabstop = 2
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.commentstring = '# %s'
     end,
   })
 end
@@ -748,6 +775,12 @@ do
 
     stylua = {},
 
+    tofu_ls = {},
+    ansiblels = {},
+    yamlls = {},
+
+    docker_language_server = {},
+
     prettierd = {},
     tailwindcss = {
       settings = {
@@ -761,7 +794,6 @@ do
         },
       },
     },
-    -- tsgo = {},
     vtsls = {
       settings = {
         vtsls = {
@@ -778,7 +810,7 @@ do
               enabled = 'all',
             },
             parameterTypes = {
-              enabled = true,
+              enabled = false,
             },
             variableTypes = {
               enabled = true,
@@ -848,6 +880,13 @@ do
         Lua = {
           format = { enable = false }, -- Disable formatting (formatting is done by stylua)
         },
+      },
+    },
+
+    tinymist = {
+      settings = {
+        exportPdf = 'onType',
+        outputPath = '$root/output/$dir/$name',
       },
     },
   }
