@@ -383,6 +383,16 @@ hl.window_rule({
 	},
 })
 
+hl.window_rule({
+	name = "ff-center",
+	size = { "monitor_w * 0.65", "monitor_h * 0.65" },
+	float = true,
+	center = true,
+	match = {
+		class = "ff-center",
+	},
+})
+
 -- Legcord
 hl.window_rule({
 	name = "legcord",
