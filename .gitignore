@@ -1,0 +1,12 @@
+*
+!.gitignore
+
+!.bashrc.d/
+!.bashrc.d/**
+.bashrc.d/servers.sh
+
+!.config
+.config/**
+
+!.config/nvim/
+!.config/nvim/**
