@@ -778,8 +778,9 @@ do
     tofu_ls = {},
     ansiblels = {},
     yamlls = {},
-
     docker_language_server = {},
+
+    clangd = {},
 
     prettierd = {},
     tailwindcss = {
@@ -883,6 +884,7 @@ do
       },
     },
 
+    typstyle = {},
     tinymist = {
       settings = {
         exportPdf = 'onType',

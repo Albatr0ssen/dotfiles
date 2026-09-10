@@ -45,6 +45,25 @@ vim.api.nvim_create_autocmd('FileType', {
         vim.notify 'Could not get tinymist lsp client'
         return
       end
-    end, { desc = 'Open pdf' })
+    end, { buf = event.buf, desc = 'Open pdf' })
+
+    vim.keymap.set('n', '<leader>cce', function(args)
+      local result = typst_export_pdf(event.buf, function(err, result)
+        if err ~= nil then
+          vim.notify('lsp error: ' .. err.message)
+          return
+        end
+        if result == nil then
+          vim.notify 'result nil'
+          return
+        end
+        vim.notify 'exported pdf'
+      end)
+
+      if result == nil then
+        vim.notify 'Could not get tinymist lsp client'
+        return
+      end
+    end, { buf = event.buf, desc = 'Export pdf' })
   end,
 })
