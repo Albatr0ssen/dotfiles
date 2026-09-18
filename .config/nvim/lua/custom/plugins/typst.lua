@@ -28,7 +28,7 @@ vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('typst-filetype', { clear = true }),
   pattern = 'typst',
   callback = function(event)
-    vim.keymap.set('n', '<leader>cco', function(args)
+    vim.keymap.set('n', '<leader>cco', function()
       local result = typst_export_pdf(event.buf, function(err, result)
         if err ~= nil then
           vim.notify('lsp error: ' .. err.message)
@@ -38,7 +38,7 @@ vim.api.nvim_create_autocmd('FileType', {
           vim.notify 'result nil'
           return
         end
-        io.popen('zathura --fork ' .. result.path)
+        vim.fn.jobstart({ 'zathura', '--fork', result.path }, { detach = true })
       end)
 
       if result == nil then
@@ -47,7 +47,7 @@ vim.api.nvim_create_autocmd('FileType', {
       end
     end, { buf = event.buf, desc = 'Open pdf' })
 
-    vim.keymap.set('n', '<leader>cce', function(args)
+    vim.keymap.set('n', '<leader>cce', function()
       local result = typst_export_pdf(event.buf, function(err, result)
         if err ~= nil then
           vim.notify('lsp error: ' .. err.message)
