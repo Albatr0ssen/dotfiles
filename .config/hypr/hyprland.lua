@@ -59,6 +59,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("gnome-text-editor", { workspace = 10 .. " silent" })
 end)
 
+hl.env("XDG_CONFIG_HOME", os.getenv("HOME") .. "/.config")
 -- hl.env("GDK_SCALE", "2")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
